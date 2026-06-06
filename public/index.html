@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VoiceForge — AI Voiceover Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #fafaf9;
+      --surface: #ffffff;
+      --border: #e8e6e1;
+      --border-strong: #ccc9c2;
+      --text: #1a1a18;
+      --text-muted: #6b6b67;
+      --text-hint: #a09e99;
+      --accent: #1a1a18;
+      --accent-soft: #f0eeea;
+      --success: #2d6a4f;
+      --success-bg: #eaf4ee;
+      --error: #9b2335;
+      --error-bg: #fdf0f2;
+      --radius: 10px;
+      --radius-lg: 16px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    nav {
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 0 2rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .logo span {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--text);
+      border-radius: 50%;
+      margin-right: 8px;
+      vertical-align: middle;
+      position: relative;
+      top: -1px;
+    }
+
+    .nav-tag {
+      font-size: 11px;
+      color: var(--text-hint);
+      border: 1px solid var(--border);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 4rem;
+    }
+
+    .page-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .page-header h1 {
+      font-size: 26px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .page-header p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .section {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      padding: 14px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      resize: vertical;
+      transition: border-color 0.15s;
+    }
+
+    textarea:focus { outline: none; border-color: var(--border-strong); }
+    textarea::placeholder { color: var(--text-hint); }
+
+    .char-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .char-count {
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      color: var(--text-hint);
+    }
+
+    .char-count.warn { color: #b45309; }
+
+    .voice-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 8px;
+    }
+
+    .voice-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: var(--surface);
+      user-select: none;
+    }
+
+    .voice-card:hover { border-color: var(--border-strong); }
+
+    .voice-card.active {
+      border-color: var(--text);
+      background: var(--accent-soft);
+    }
+
+    .voice-card .vname {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .voice-card .vtag {
+      font-size: 11px;
+      color: var(--text-hint);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b67' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    select:focus { outline: none; border-color: var(--border-strong); }
+
+    .custom-id-row {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .custom-id-row input {
+      width: 100%;
+      padding: 10px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: border-color 0.15s;
+    }
+
+    .custom-id-row input:focus { outline: none; border-color: var(--border-strong); }
+    .custom-id-row input::placeholder { color: var(--text-hint); }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.75rem 0;
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 13px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--bg);
+      background: var(--text);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.15s;
+      letter-spacing: -0.01em;
+    }
+
+    .generate-btn:hover { opacity: 0.85; }
+    .generate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .spinner {
+      width: 15px;
+      height: 15px;
+      border: 2px solid rgba(250,250,249,0.3);
+      border-top-color: var(--bg);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status-row {
+      margin-top: 10px;
+      min-height: 18px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'DM Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .output-card {
+      display: none;
+      margin-top: 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .output-card.visible { display: block; }
+
+    .output-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .output-header span {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .dl-btn {
+      font-size: 12px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .dl-btn:hover { background: var(--accent-soft); }
+
+    .output-body { padding: 18px; }
+
+    audio {
+      width: 100%;
+      height: 36px;
+    }
+
+    .error-box {
+      display: none;
+      margin-top: 10px;
+      padding: 12px 14px;
+      background: var(--error-bg);
+      border: 1px solid #f5c2c8;
+      border-radius: var(--radius);
+      font-size: 13px;
+      color: var(--error);
+    }
+
+    .success-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      color: var(--success);
+      background: var(--success-bg);
+      border-radius: 20px;
+      padding: 3px 10px;
+    }
+
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 12px;
+      color: var(--text-hint);
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#"><span></span>VoiceForge</a>
+  <span class="nav-tag">beta</span>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>AI voiceover studio</h1>
+    <p>Paste your script, pick a voice, and generate broadcast-quality audio.</p>
+  </div>
+
+  <div class="section">
+    <label>Script</label>
+    <textarea id="scriptText" placeholder="The night before the 2016 Champions League final, Cristiano Ronaldo sat alone in his hotel room..." oninput="updateCount()"></textarea>
+    <div class="char-row">
+      <span></span>
+      <span class="char-count" id="charCount">0 / 5000</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <label>Voice</label>
+    <div class="voice-grid" id="voiceGrid">
+      <div class="voice-card active" data-id="NOpBlnGInO9m6vDvFkFC" onclick="selectVoice(this)">
+        <div class="vname">Adam</div>
+        <div class="vtag">Deep · Documentary</div>
+      </div>
+      <div class="voice-card" data-id="ErXwobaYiN019PkySvjV" onclick="selectVoice(this)">
+        <div class="vname">Antoni</div>
+        <div class="vtag">Warm · Storytelling</div>
+      </div>
+      <div class="voice-card" data-id="VR6AewLTigWG4xSOukaG" onclick="selectVoice(this)">
+        <div class="vname">Arnold</div>
+        <div class="vtag">Strong · Dramatic</div>
+      </div>
+      <div class="voice-card" data-id="TxGEqnHWrfWFTfGW9XjX" onclick="selectVoice(this)">
+        <div class="vname">Josh</div>
+        <div class="vtag">Energetic · Sports</div>
+      </div>
+      <div class="voice-card" data-id="custom" onclick="selectVoice(this)">
+        <div class="vname">Custom</div>
+        <div class="vtag">Paste voice ID</div>
+      </div>
+    </div>
+    <div class="custom-id-row" id="customRow">
+      <input type="text" id="customId" placeholder="Paste ElevenLabs voice ID..." />
+    </div>
+  </div>
+
+  <div class="two-col section">
+    <div>
+      <label>Model</label>
+      <select id="modelId">
+        <option value="eleven_v3">Eleven v3 — best quality</option>
+        <option value="eleven_turbo_v2_5">Turbo v2.5 — faster</option>
+        <option value="eleven_multilingual_v2">Multilingual v2</option>
+      </select>
+    </div>
+    <div>
+      <label>Language</label>
+      <select id="langCode">
+        <option value="en">English</option>
+        <option value="hi">Hindi</option>
+        <option value="es">Spanish</option>
+        <option value="pt">Portuguese</option>
+        <option value="fr">French</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <button class="generate-btn" id="genBtn" onclick="generate()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    Generate voiceover
+  </button>
+
+  <div class="status-row" id="statusRow"></div>
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="output-card" id="outputCard">
+    <div class="output-header">
+      <span>Output</span>
+      <button class="dl-btn" onclick="downloadAudio()">↓ Download MP3</button>
+    </div>
+    <div class="output-body">
+      <audio id="audioPlayer" controls></audio>
+    </div>
+  </div>
+</main>
+
+<footer>
+  VoiceForge — powered by ElevenLabs · built for your channel
+</footer>
+
+<script>
+  let selectedVoiceId = 'NOpBlnGInO9m6vDvFkFC';
+  let audioBlob = null;
+
+  function updateCount() {
+    const len = document.getElementById('scriptText').value.length;
+    const el = document.getElementById('charCount');
+    el.textContent = len + ' / 5000';
+    el.classList.toggle('warn', len > 4500);
+  }
+
+  function selectVoice(el) {
+    document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    selectedVoiceId = el.dataset.id;
+    document.getElementById('customRow').style.display = selectedVoiceId === 'custom' ? 'block' : 'none';
+  }
+
+  function setStatus(msg, loading) {
+    const el = document.getElementById('statusRow');
+    if (!msg) { el.innerHTML = ''; return; }
+    el.innerHTML = loading
+      ? `<div class="spinner"></div><span>${msg}</span>`
+      : `<span class="success-pill"><span class="dot"></span>${msg}</span>`;
+  }
+
+  function setError(msg) {
+    const el = document.getElementById('errorBox');
+    el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+  }
+
+  async function generate() {
+    const script = document.getElementById('scriptText').value.trim();
+    const model = document.getElementById('modelId').value;
+    const lang = document.getElementById('langCode').value;
+    let voiceId = selectedVoiceId === 'custom'
+      ? document.getElementById('customId').value.trim()
+      : selectedVoiceId;
+
+    if (!script) { setError('Please enter a script first.'); return; }
+    if (!voiceId) { setError('Please enter a custom voice ID.'); return; }
+
+    setError('');
+    document.getElementById('genBtn').disabled = true;
+    document.getElementById('outputCard').classList.remove('visible');
+    setStatus('Generating voiceover...', true);
+
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: script, voiceId, modelId: model, languageCode: lang })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Server error ${res.status}`);
+      }
+
+      audioBlob = await res.blob();
+      const url = URL.createObjectURL(audioBlob);
+      document.getElementById('audioPlayer').src = url;
+      document.getElementById('outputCard').classList.add('visible');
+      setStatus('done · ready to play', false);
+    } catch (e) {
+      setError('Error: ' + e.message);
+      setStatus('', false);
+    } finally {
+      document.getElementById('genBtn').disabled = false;
+    }
+  }
+
+  function downloadAudio() {
+    if (!audioBlob) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(audioBlob);
+    a.download = 'voiceover.mp3';
+    a.click();
+  }
+
+  updateCount();
+</script>
+</body>
+</html>
