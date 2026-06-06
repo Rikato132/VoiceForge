@@ -1,0 +1,77 @@
+# VoiceForge — AI Voiceover Studio
+
+A clean, minimal web app for generating AI voiceovers using ElevenLabs.
+Built for your YouTube Shorts channel.
+
+---
+
+## Setup (5 minutes)
+
+### 1. Install dependencies
+```bash
+npm install
+```
+
+### 2. Add your ElevenLabs API key
+Create a `.env` file in the root folder:
+```
+ELEVENLABS_API_KEY=your_api_key_here
+```
+Get your key from: https://elevenlabs.io → Profile → API Keys
+
+### 3. Install dotenv support (to load .env)
+```bash
+npm install dotenv
+```
+Then add this line at the very top of `server/index.mjs`:
+```js
+import 'dotenv/config';
+```
+
+### 4. Run the app
+```bash
+npm start
+```
+Open http://localhost:3000 in your browser. Done!
+
+---
+
+## Deploy for free (optional)
+
+### Railway (easiest)
+1. Push this folder to a GitHub repo
+2. Go to railway.app → New Project → Deploy from GitHub
+3. Add environment variable: `ELEVENLABS_API_KEY = your_key`
+4. Railway gives you a public URL automatically
+
+### Render
+1. Push to GitHub
+2. Go to render.com → New Web Service → connect repo
+3. Build command: `npm install`
+4. Start command: `npm start`
+5. Add `ELEVENLABS_API_KEY` in Environment tab
+
+---
+
+## Voice IDs (ElevenLabs defaults)
+| Voice  | ID                      | Best for          |
+|--------|-------------------------|-------------------|
+| Adam   | NOpBlnGInO9m6vDvFkFC   | Documentary       |
+| Antoni | ErXwobaYiN019PkySvjV   | Storytelling      |
+| Arnold | VR6AewLTigWG4xSOukaG   | Dramatic          |
+| Josh   | TxGEqnHWrfWFTfGW9XjX   | Sports/Energetic  |
+
+Find more voices at: https://elevenlabs.io/voice-library
+
+---
+
+## File structure
+```
+voiceforge/
+├── public/
+│   └── index.html     ← Frontend (the website)
+├── server/
+│   └── index.mjs      ← Backend (talks to ElevenLabs)
+├── package.json
+└── README.md
+```
